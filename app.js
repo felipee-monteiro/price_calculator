@@ -27,17 +27,17 @@ let inputName = document.getElementById("name");
 let inputValue = document.getElementById("value");
 let itemHTML = document.getElementById("itemData");
 let ammountItem = document.getElementById("ammount");
-let moneyData = localStorage.getItem("moneyInfo") !== null ? JSON.parse(localStorage.getItem("moneyInfo")) : [{totalMoney: Number(window.prompt("Qual o valor que deseja Administrar ?")),items: []}];
+let moneyData = localStorage.getItem("moneyInfo") !== null ? JSON.parse(localStorage.getItem("moneyInfo")) : [{totalMoney: Number(window.prompt("Qual valor deseja Administrar ?")),items: []}];
 let [moneyInfo] = moneyData;
+let {totalMoney, items} = moneyInfo;
 
-moneyH3.innerText = `R$ ${moneyInfo.totalMoney}`;
+moneyH3.innerText = `R$ ${totalMoney}`;
 dimiMoney.innerText = "R$ 0";
 
-addButton.onclick = () => {;
+addButton.onclick = () => {
      
      let newProductValue = Math.abs(inputValue.value);
      let newProductName = inputName.value;
-     let {totalMoney, items} = moneyInfo;
 
      if (newProductName == "" || newProductValue === 0){
         window.alert("Por favor, preencha todos os Campos Corretamente.") 
@@ -84,12 +84,12 @@ addButton.onclick = () => {;
             const parent = el.parentNode;
             parent.remove();
 
-            let [{value, id}] = items.filter(item => item.id === i);
-            const [deleted] = items.splice(id, 1); 
+            let [{value, id, ammount}] = items.filter(item => item.id === i);
+            const [{value: valueDeleted}] = items.splice(id, 1); 
+           
+            if (totalMoney + sumAllValuesDimi() === totalMoney) totalMoney = totalMoney + (value * ammount);
 
-            console.log(deleted);
-
-            moneyH3.innerText = `R$ ${totalMoney + value}`;
+            moneyH3.innerText = `R$ ${totalMoney}`;
             dimiMoney.innerText = `R$ ${sumAllValuesDimi()}`;
             
             localStorage.setItem("moneyInfo", JSON.stringify(moneyData));
