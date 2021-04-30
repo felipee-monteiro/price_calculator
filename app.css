@@ -1,0 +1,30 @@
+
+.--container {
+	max-width: 40rem;
+	margin: 0 1rem;
+}
+
+.--transactions {
+	padding: .8rem 1rem;
+	display: block;
+}
+
+.--transactions-content{
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.--transactions-title{
+	font-weight: 800;
+	padding: .5rem;
+}
+
+.hidden {
+	display: none;
+	visibility: hidden;
+}
+
+[placeholder]{
+    text-overflow: ellipsis!important;
+}
