@@ -1,25 +1,3 @@
-// const matrix = [ [2,4,6,8], [12,14,16,18], [20,24,28,32], [32,34,36,38], [42,44,46,48] ];
-
-// let [operators] = matrix;
-
-// let [mult, divide, dimi, sum] = operators; 
-// let [,...restArray] = matrix;
-
-// const resultOperatorsMultiply = restArray[0].map( value => mult * value); 
-
-// const resultOperatorsDivide = restArray[1].map( value =>  value / divide);
-
-// const resultOperatorsDiminute = restArray[2].map(value => value - dimi);
-
-// const resultOperatorsSum = restArray[3].map(value => sum + value);
-
-// const finalResultArray = operators.concat(resultOperatorsMultiply, resultOperatorsDivide, resultOperatorsDiminute, resultOperatorsSum);
-
-// const finalResult = finalResultArray.reduce((acc, currentValue) => acc + currentValue, 0);
-
-
-
-
 let addButton = document.getElementById("addButton");
 let moneyH3 = document.getElementById("totalMoney");
 let dimiMoney = document.getElementById("dimiMoney");
@@ -27,93 +5,91 @@ let inputName = document.getElementById("name");
 let inputValue = document.getElementById("value");
 let itemHTML = document.getElementById("itemData");
 let ammountItem = document.getElementById("ammount");
-let moneyData = localStorage.getItem("moneyInfo") !== null ? JSON.parse(localStorage.getItem("moneyInfo")) : [{totalMoney: Number(window.prompt("Qual valor deseja Administrar ?")),items: []}];
-let [{items, totalMoney}] = moneyData;
+let moneyData = localStorage.getItem("moneyInfo") === null ? [{totalMoney: Number(window.prompt("Qual valor deseja Administrar ?")), items: new Array()}] : JSON.parse(localStorage.getItem("moneyInfo"));
+let [{totalMoney, items}] = moneyData;
 
-moneyH3.innerText = `R$ ${totalMoney}`;
-dimiMoney.innerText = "R$ 0";
+updateValuesFromPage();
 
-addButton.onclick = () => {
-     
-     let newProductValue = Math.abs(inputValue.value);
-     let newProductName = inputName.value;
+function createElement(elementName, attr = null) {
+    const el = document.createElement(elementName);
 
-     if (newProductName.trim() === "" || newProductValue === 0){
-        window.alert("Por favor, preencha todos os Campos Corretamente.") 
-        return;
-     }
-
-     items.push({
-     	name: newProductName,
-        ammount: Number(ammountItem.value),
-        value: newProductValue,
-     });
-
-     const createElementsAndInsertIntoPage = (item, index) => {
-            const h6 = createElement("h6", {className: "d-flex justify-content-between"});
-            const button = createElement("button", {id: index, className: "btn-close"});
-
-            h6.textContent = `${item.ammount} - ${item.name} - R$ ${item.value * item.ammount}`;
-            h6.append(button);
-            itemHTML.append(h6);    
-     }
-
-    const init = () => {
-            itemHTML.innerHTML = "";
-            items.forEach((item, index) => {
-               item["id"] = index;
-               if (item.ammount === 0) item.ammount++;
-               createElementsAndInsertIntoPage(item, index);
-            });
-     };
-
-     const updateValuesFromPage = () => {
-        let sumAllValuesDimi = () => items.reduce((acc, item) => acc + item.value * item.ammount, 0);
-        const sumAllValuesDimiAsNumber = Number(sumAllValuesDimi()).toFixed(2);
-     
-        moneyH3.innerText = `R$ ${totalMoney - sumAllValuesDimi()}`;
-        dimiMoney.innerText = `R$ ${sumAllValuesDimiAsNumber}`;
+    if(attr !== null && typeof attr === 'object') {
+        Object.keys(attr).forEach(function(i, ind) {
+            el.setAttribute(i, attr[i]);
+        });
     }
 
-     const createElement = (elementName, attr = null) => {
-        const el = document.createElement(elementName);
-        const {id, className} = attr;
+    return el;
+};
 
-        if (attr !== undefined) {
-            el.setAttribute("id", id);
-            el.className = className; 
-        }
+function createElementsAndInsertIntoPage(item, index) {
+    const div = createElement("div", {class: "d-flex align-items-center justify-content-between"});
+    const h6 = createElement("h6");
+    const button = createElement("button", {id: index, class: "btn-close"});
 
-        return el;
-     };
+    h6.textContent = `${ item.ammount } - ${ item.name } - R$ ${ item.value * item.ammount }`;
+    div.appendChild(h6);
+    div.appendChild(button);
+    itemHTML.classList.remove("hidden");
+    itemHTML.append(div);
+}
 
-     const removeItemFromPage = (i) => {       
-            const newArrayMoneyItems = items.filter(item => item.id !== i);
-            
-            items = newArrayMoneyItems;
+function init() {
+    itemHTML.innerHTML = "";
+    items.forEach((item, index) => {
+        item["id"] = index;
+        if(item.ammount === 0) item.ammount++;
+        createElementsAndInsertIntoPage(item, index);
+    });
+}
 
-            updateValuesFromPage();
+init();
 
-            init();
+function removeItemFromPage(i) {
+    items = items.filter(item => item.id !== i);
+    updateValuesFromPage();
+    init();
+    localStorage.setItem("moneyInfo", JSON.stringify([{totalMoney, items}]));
+}
 
-            localStorage.setItem("moneyInfo", JSON.stringify([{totalMoney, items}]));
-     };
+function updateValuesFromPage(){
+    let sumAllValuesDimi = () => items.reduce((acc, item) => acc + item.value * item.ammount, 0);
+    const sumAllValuesDimiAsNumber = Number(sumAllValuesDimi()).toFixed(2);
 
-    itemHTML.addEventListener("click", e => {
-        const clickedElement = e.target;
-        const idElementAsNumber = Number(e.target.id);
+    moneyH3.innerText = `R$ ${ totalMoney - sumAllValuesDimi() }`;
+    dimiMoney.innerText = `R$ ${ sumAllValuesDimiAsNumber }`;
+    itemHTML.classList.add("hidden");
+}
 
-        if (clickedElement.tagName === "BUTTON") {
-             removeItemFromPage(idElementAsNumber);
-        }
+itemHTML.addEventListener("click", e => {
+    const clickedElement = e.target;
+    const idElementAsNumber = Number(e.target.id);
+
+    if(clickedElement.tagName === "BUTTON") {
+        removeItemFromPage(idElementAsNumber);
+    }
+});
+
+addButton.onclick = () => {
+    let newProductValue = Math.abs(inputValue.value);
+    let newProductName = inputName.value;
+
+    if(newProductName.trim() === "" || newProductValue === 0) {
+        window.alert("Por favor, preencha todos os Campos Corretamente.");
+        return;
+    }
+
+    items.push({
+        name: newProductName,
+        ammount: Number(ammountItem.value),
+        value: newProductValue,
     });
 
-     localStorage.setItem("moneyInfo", JSON.stringify([{totalMoney, totalMoney}]));
+    localStorage.setItem("moneyInfo", JSON.stringify([{totalMoney, items}]));
 
-     inputName.value = "";
-     inputValue.value = "";
-     
-     updateValuesFromPage();
-     init();
+    inputName.value = "";
+    inputValue.value = "";
 
+    updateValuesFromPage();
+    init();
 };
