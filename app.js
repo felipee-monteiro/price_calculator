@@ -12,13 +12,11 @@ updateValuesFromPage();
 
 function createElement(elementName, attr = null) {
     const el = document.createElement(elementName);
-
     if(attr !== null && typeof attr === 'object') {
         Object.keys(attr).forEach(function(i, ind) {
             el.setAttribute(i, attr[i]);
         });
     }
-
     return el;
 };
 
@@ -27,7 +25,7 @@ function createElementsAndInsertIntoPage(item, index) {
     const h6 = createElement("h6");
     const button = createElement("button", {id: index, class: "btn-close"});
 
-    h6.textContent = `${ item.ammount } - ${ item.name } - R$ ${ item.value * item.ammount }`;
+    h6.textContent = `${ item.ammount } - ${ item.name } - R$${item.value} - (R$ ${ item.value * item.ammount })`;
     div.appendChild(h6);
     div.appendChild(button);
     itemHTML.classList.remove("hidden");
@@ -55,10 +53,14 @@ function removeItemFromPage(i) {
 function updateValuesFromPage(){
     let sumAllValuesDimi = () => items.reduce((acc, item) => acc + item.value * item.ammount, 0);
     const sumAllValuesDimiAsNumber = Number(sumAllValuesDimi()).toFixed(2);
+    const totalValues = totalMoney - sumAllValuesDimi();
 
-    moneyH3.innerText = `R$ ${ totalMoney - sumAllValuesDimi() }`;
+    moneyH3.innerText = `R$ ${ totalValues }`;
     dimiMoney.innerText = `R$ ${ sumAllValuesDimiAsNumber }`;
     itemHTML.classList.add("hidden");
+    if (totalValues <= 100) {
+        alert("Seu saldo está prestes a esgotar.");
+    }
 }
 
 itemHTML.addEventListener("click", e => {
